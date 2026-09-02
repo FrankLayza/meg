@@ -1,6 +1,6 @@
 # Milestone-Escrow Guardian: Three-Person Task Board
 
-**Working agreement:** Each task must leave a runnable artifact, tests or evidence, and a short note in the PR/commit. Keep the seeded demo working at the end of every phase. No production funds; use Base Sepolia only.
+**Working agreement:** Each contributor owns an independently runnable workstream. Every task must leave a runnable artifact, tests or evidence, and a short note in the PR/commit. Use mocks, fixtures, and documented interfaces when another workstream is unavailable. No production funds; use Base Sepolia only.
 
 ## Ownership
 
@@ -42,14 +42,36 @@
 
 **Done when:** A new contributor can reproduce the full flow quickly and the submission package is complete and truthful.
 
-## Shared Milestones and Dependencies
+## Independent Deliverables
 
-- [ ] **M0: Eligibility and scope (all):** confirm registration status, freeze one-milestone MVP, choose stack, and agree on acceptance criteria.
-- [ ] **M1: Memory vertical slice (1 + 3):** seeded project, recall, decision output, and visible rationale.
-- [ ] **M2: Safety and Base vertical slice (2 + 1):** policy gate consumes the decision schema and executes a bounded testnet release.
+Each contributor should be able to finish and verify their work without waiting for another contributor. Integration starts only after all three standalone deliverables pass their own acceptance checks.
+
+### Contributor 1 interface
+
+- Input fixture: project history, requirements, feedback, and evidence in a documented JSON format.
+- Output contract: validated decision JSON containing `outcome`, `rationale`, `confidence`, `cited_memory_ids`, `cited_evidence_ids`, and `missing_information`.
+- Local verification: run the Guardian against seeded fixtures with a fake memory adapter and no blockchain.
+
+### Contributor 2 interface
+
+- Input fixture: decision JSON matching Contributor 1's documented output contract, with no live model or Sibyl dependency.
+- Output contract: policy result plus escrow action state and transaction metadata.
+- Local verification: run approval, rejection, escalation, duplicate-release, and chain-failure cases against a mock contract before using Base Sepolia.
+
+### Contributor 3 interface
+
+- Input fixture: example project, evidence, decision JSON, policy result, and transaction metadata.
+- Output contract: a complete user-facing flow that can render seeded results without the live Guardian or blockchain.
+- Local verification: reset and replay the demo using fixtures, then validate the README and video script independently.
+
+## Integration Milestones
+
+- [ ] **M0: Interface freeze (all):** agree on the JSON schemas, fixture format, and success criteria. This is a short coordination step, not a blocking implementation dependency.
+- [ ] **M1: Standalone completion (each contributor):** each workstream passes its own local verification using mocks or fixtures.
+- [ ] **M2: Integration (all):** connect the three completed deliverables through the frozen interfaces.
 - [ ] **M3: Integrated demo (all):** fresh-session revision path, approval path, audit trail, and resettable seed.
-- [ ] **M4: Verification (all):** tests, deletion test, adversarial cases, second-run test, and non-author setup walkthrough.
-- [ ] **M5: Submission (3 owner, all reviewers):** public repo, MIT/Apache license, README, video, two tagged posts, and build page marked ready.
+- [ ] **M4: Final verification (all):** tests, deletion test, adversarial cases, second-run test, and non-author setup walkthrough.
+- [ ] **M5: Submission (Contributor 3 owner, all reviewers):** public repo, MIT/Apache license, README, video, two tagged posts, and build page marked ready.
 
 ## Definition of Done
 
@@ -63,3 +85,4 @@
 
 - 2026-09-02: MVP constrained to software-freelance milestones so the memory dependency and Base action fit a short hackathon demo.
 - 2026-09-02: Agent recommendation is separated from deterministic money-movement policy to reduce safety and judging risk.
+- 2026-09-02: Workstreams are independent by default; integration uses frozen JSON contracts, mocks, and fixtures rather than implementation-time dependencies.

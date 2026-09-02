@@ -150,7 +150,7 @@ Freeze the MVP scope, decision schema, memory taxonomy, policy rules, contract i
 
 ### Build
 
-Implement vertical slices in this order: memory-backed review, policy gate, Base escrow action, UI/CLI, audit trail, then polish. Keep a runnable seeded demo after every slice.
+Implement the three workstreams in parallel against frozen JSON contracts and seeded fixtures: memory-backed review, policy/escrow, and product/demo surface. Each workstream must be independently runnable and testable with mocks. Integrate only after all standalone acceptance checks pass, then keep a runnable seeded demo after every integration change.
 
 ### Verify
 
