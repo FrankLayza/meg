@@ -2,14 +2,10 @@
 venv/
 __pycache__/
 *.py[cod]
-.pytest_cache/
 *.egg-info/
+.pytest_cache/
 .coverage
 htmlcov/
-node_modules/
-dist/
-.turbo/
-.pnpm-store/
 .env
 .env.*
 !.env.example
@@ -20,8 +16,3 @@ dist/
 *.sqlite
 *.sqlite3
 *.log
-coverage/
-.DS_Store
-Thumbs.db
-.idea/
-.vscode/
