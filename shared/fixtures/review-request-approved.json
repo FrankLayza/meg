@@ -1,0 +1,24 @@
+{
+  "project_id": "project-001",
+  "milestone_id": "milestone-001",
+  "acceptance_criteria": [
+    "API requests must support retries",
+    "API requests must be idempotent"
+  ],
+  "feedback": [
+    {
+      "id": "feedback-001",
+      "author": "backer-001",
+      "content": "Please focus the next iteration on API architecture, retries, and idempotency."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "commit-def456",
+      "type": "github_commit",
+      "locator": "https://github.com/example/project/commit/def456",
+      "summary": "Adds retry handling and idempotent request keys to the API.",
+      "content_hash": "sha256:example-def456"
+    }
+  ]
+}

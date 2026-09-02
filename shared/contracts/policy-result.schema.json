@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://milestone-escrow-guardian.local/contracts/policy-result.schema.json",
+  "title": "Escrow Policy Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["allowed", "reason", "decision_outcome", "escrow_action"],
+  "properties": {
+    "allowed": { "type": "boolean" },
+    "reason": { "type": "string", "minLength": 1 },
+    "decision_outcome": {
+      "type": "string",
+      "enum": ["approve", "request_revision", "escalate"]
+    },
+    "escrow_action": {
+      "type": "string",
+      "enum": ["release", "hold", "escalate"]
+    },
+    "transaction_hash": { "type": ["string", "null"] },
+    "receipt_status": { "type": ["string", "null"] }
+  }
+}

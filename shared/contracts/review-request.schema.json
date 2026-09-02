@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://milestone-escrow-guardian.local/contracts/review-request.schema.json",
+  "title": "Guardian Review Request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["project_id", "milestone_id", "acceptance_criteria", "feedback", "evidence"],
+  "properties": {
+    "project_id": { "type": "string", "minLength": 1 },
+    "milestone_id": { "type": "string", "minLength": 1 },
+    "acceptance_criteria": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "feedback": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "author", "content"],
+        "properties": {
+          "id": { "type": "string" },
+          "author": { "type": "string" },
+          "content": { "type": "string" }
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "type", "locator", "summary"],
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string" },
+          "locator": { "type": "string" },
+          "summary": { "type": "string" },
+          "content_hash": { "type": "string" }
+        }
+      }
+    }
+  }
+}

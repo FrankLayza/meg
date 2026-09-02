@@ -4,10 +4,10 @@
 
 ## Ownership
 
-### Contributor 1: Memory and Guardian Logic
+### Contributor 1: Memory and Guardian Logic (You)
 
 - [ ] Define the memory taxonomy and project-scoped identifiers.
-- [ ] Implement Sibyl writes for requirements, entities, feedback, evidence, decisions, and unresolved issues.
+- [ ] Implement real Sibyl writes for requirements, entities, feedback, evidence, decisions, and unresolved issues.
 - [ ] Implement fresh-session retrieval and context packaging.
 - [ ] Define the structured decision schema: `approve`, `request_revision`, `escalate`.
 - [ ] Implement model output validation and cited-memory/cited-evidence rationale.
@@ -48,9 +48,9 @@ Each contributor should be able to finish and verify their work without waiting 
 
 ### Contributor 1 interface
 
-- Input fixture: project history, requirements, feedback, and evidence in a documented JSON format.
+- Input fixture: project history, requirements, feedback, and evidence in a documented JSON format seeded into an isolated real Sibyl database.
 - Output contract: validated decision JSON containing `outcome`, `rationale`, `confidence`, `cited_memory_ids`, `cited_evidence_ids`, and `missing_information`.
-- Local verification: run the Guardian against seeded fixtures with a fake memory adapter and no blockchain.
+- Local verification: run the Guardian against seeded fixtures with the real Sibyl client and no blockchain or LLM.
 
 ### Contributor 2 interface
 

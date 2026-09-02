@@ -16,6 +16,9 @@
 - Sibyl Memory is local-first, file-based memory backed by SQLite and FTS5, with zero embeddings.
 - Official setup: `pip install 'sibyl-memory-cli[mcp]'`, `sibyl init`, and `sibyl setup`.
 - Supports Codex, Claude Code, Cursor, Hermes, and MCP-compatible clients.
+- URL: https://docs.sibyllabs.org/memory/integrations
+- The direct SDK documented by Sibyl is Python: `sibyl-memory-client` with `MemoryClient.local(...)` and the complete read/write API.
+- The MCP server is stdio-based and portable to TypeScript or any MCP client; the documented MCP tools are `search`, `recall`, and `list`.
 
 ### Product Direction
 - URL: https://hack.sibyllabs.org/ (project brief and positioning)
@@ -43,3 +46,7 @@ Session A records a backer requirement about API retries and idempotency. Sessio
 ### Timing Constraint
 
 The site states registration closed August 31, 2026, while the build window ends September 10, 2026. Confirm late-entry status or an existing registered-team link through the official Discord before relying on submission eligibility.
+
+### Language Decision
+
+Use Python for Contributor 1's first implementation because direct Sibyl writes and reads are documented there. Keep the Guardian's model provider independent. A future TypeScript UI or orchestrator can use Sibyl MCP through the MCP TypeScript SDK, or call a small Python memory service, but the official docs do not currently document an equivalent TypeScript Sibyl SDK.
