@@ -6,7 +6,7 @@ from .sibyl_store import SibylStore
 
 
 class Guardian:
-    def __init__(self, store: SibylStore, reasoner: ReasoningProvider | None = None):
+    def __init__(self, store: SibylStore, reasoner: ReasoningProvider | None = None) -> None:
         self._store = store
         self._reasoner = reasoner or DeterministicReasoner()
 

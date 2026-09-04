@@ -16,11 +16,21 @@ guardian-review ..\..\shared\fixtures\review-request-missing-idempotency.json --
 
 The `--seed` run stores requirements and feedback in Sibyl. A later run against the same database represents a fresh session and retrieves the stored context.
 
+## Verification
+
+Run the standalone suite with the workspace virtual environment:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest -q
+```
+
+The tests use a real `MemoryClient.local(...)` database under pytest's temporary directory. They cover fresh-session recall, approval, missing evidence, unresolved issues, contradictory feedback, malformed input, and the memory-deletion case. The deletion case runs the same request against an empty database and verifies that the Guardian escalates because no project criteria can be recalled.
+
 ## Sibyl Tier Mapping
 
 - HOT: current milestone review state via `set_state`.
 - WARM: project entity via `set_entity`.
-- COLD: feedback, evidence, and decisions via `write_event`.
+- COLD: feedback, evidence, unresolved issues, prior decisions, and current decisions via `write_event`.
 - REFERENCE: acceptance criteria via `set_reference`.
 - ARCHIVE: reserved for superseded project entities.
 

@@ -18,3 +18,7 @@ def main() -> None:
     if args.seed:
         guardian.seed(request)
     print(json.dumps(decision_to_dict(guardian.review(request)), indent=2))
+
+
+if __name__ == "__main__":
+    main()

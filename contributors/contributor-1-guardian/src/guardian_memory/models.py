@@ -21,12 +21,27 @@ class Evidence:
 
 
 @dataclass(frozen=True)
+class UnresolvedIssue:
+    id: str
+    description: str
+
+
+@dataclass(frozen=True)
+class PriorDecision:
+    id: str
+    outcome: Outcome
+    rationale: str
+
+
+@dataclass(frozen=True)
 class ReviewRequest:
     project_id: str
     milestone_id: str
     acceptance_criteria: tuple[str, ...]
     feedback: tuple[Feedback, ...]
     evidence: tuple[Evidence, ...]
+    unresolved_issues: tuple[UnresolvedIssue, ...] = ()
+    prior_decisions: tuple[PriorDecision, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -40,6 +55,10 @@ class Decision:
 
 
 def review_request_from_dict(raw: Mapping[str, object]) -> ReviewRequest:
+    allowed_fields = {"project_id", "milestone_id", "acceptance_criteria", "feedback", "evidence", "unresolved_issues", "prior_decisions"}
+    unknown_fields = set(raw) - allowed_fields
+    if unknown_fields:
+        raise ValueError(f"unknown review request fields: {', '.join(sorted(unknown_fields))}")
     feedback_items = raw.get("feedback")
     evidence_items = raw.get("evidence")
     criteria = raw.get("acceptance_criteria")
@@ -55,36 +74,79 @@ def review_request_from_dict(raw: Mapping[str, object]) -> ReviewRequest:
             raise ValueError(f"{field} must be a non-empty string")
         return value
 
-    feedback = tuple(
-        Feedback(
-            id=required_text(item.get("id"), "feedback.id"),
-            author=required_text(item.get("author"), "feedback.author"),
-            content=required_text(item.get("content"), "feedback.content"),
+    feedback: list[Feedback] = []
+    for item in feedback_items:
+        if not isinstance(item, Mapping):
+            raise ValueError("feedback items must be objects")
+        feedback.append(
+            Feedback(
+                id=required_text(item.get("id"), "feedback.id"),
+                author=required_text(item.get("author"), "feedback.author"),
+                content=required_text(item.get("content"), "feedback.content"),
+            )
         )
-        for item in feedback_items
-        if isinstance(item, Mapping)
-    )
-    evidence = tuple(
-        Evidence(
-            id=required_text(item.get("id"), "evidence.id"),
-            type=required_text(item.get("type"), "evidence.type"),
-            locator=required_text(item.get("locator"), "evidence.locator"),
-            summary=required_text(item.get("summary"), "evidence.summary"),
-            content_hash=item.get("content_hash") if isinstance(item.get("content_hash"), str) else None,
+
+    evidence: list[Evidence] = []
+    for item in evidence_items:
+        if not isinstance(item, Mapping):
+            raise ValueError("evidence items must be objects")
+        evidence.append(
+            Evidence(
+                id=required_text(item.get("id"), "evidence.id"),
+                type=required_text(item.get("type"), "evidence.type"),
+                locator=required_text(item.get("locator"), "evidence.locator"),
+                summary=required_text(item.get("summary"), "evidence.summary"),
+                content_hash=item.get("content_hash") if isinstance(item.get("content_hash"), str) else None,
+            )
         )
-        for item in evidence_items
-        if isinstance(item, Mapping)
-    )
+
+    unresolved_raw = raw.get("unresolved_issues", [])
+    if not isinstance(unresolved_raw, Sequence) or isinstance(unresolved_raw, (str, bytes)):
+        raise ValueError("unresolved_issues must be a list")
+    unresolved_issues: list[UnresolvedIssue] = []
+    for item in unresolved_raw:
+        if not isinstance(item, Mapping):
+            raise ValueError("unresolved issue items must be objects")
+        unresolved_issues.append(
+            UnresolvedIssue(
+                id=required_text(item.get("id"), "unresolved_issues.id"),
+                description=required_text(item.get("description"), "unresolved_issues.description"),
+            )
+        )
+
+    decisions_raw = raw.get("prior_decisions", [])
+    if not isinstance(decisions_raw, Sequence) or isinstance(decisions_raw, (str, bytes)):
+        raise ValueError("prior_decisions must be a list")
+    prior_decisions: list[PriorDecision] = []
+    for item in decisions_raw:
+        if not isinstance(item, Mapping):
+            raise ValueError("prior decision items must be objects")
+        outcome = item.get("outcome")
+        if outcome not in {"approve", "request_revision", "escalate"}:
+            raise ValueError("prior_decisions.outcome is invalid")
+        prior_decisions.append(
+            PriorDecision(
+                id=required_text(item.get("id"), "prior_decisions.id"),
+                outcome=outcome,
+                rationale=required_text(item.get("rationale"), "prior_decisions.rationale"),
+            )
+        )
     return ReviewRequest(
         project_id=required_text(raw.get("project_id"), "project_id"),
         milestone_id=required_text(raw.get("milestone_id"), "milestone_id"),
         acceptance_criteria=tuple(required_text(item, "acceptance_criteria item") for item in criteria),
-        feedback=feedback,
-        evidence=evidence,
+        feedback=tuple(feedback),
+        evidence=tuple(evidence),
+        unresolved_issues=tuple(unresolved_issues),
+        prior_decisions=tuple(prior_decisions),
     )
 
 
 def decision_from_dict(raw: Mapping[str, object]) -> Decision:
+    allowed_fields = {"outcome", "rationale", "confidence", "cited_memory_ids", "cited_evidence_ids", "missing_information"}
+    unknown_fields = set(raw) - allowed_fields
+    if unknown_fields:
+        raise ValueError(f"unknown decision fields: {', '.join(sorted(unknown_fields))}")
     outcome = raw.get("outcome")
     if outcome not in {"approve", "request_revision", "escalate"}:
         raise ValueError("outcome must be approve, request_revision, or escalate")
