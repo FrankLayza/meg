@@ -6,15 +6,17 @@
 
 ### Contributor 1: Memory and Guardian Logic (You)
 
-- [ ] Define the memory taxonomy and project-scoped identifiers.
-- [ ] Implement real Sibyl writes for requirements, entities, feedback, evidence, decisions, and unresolved issues.
-- [ ] Implement fresh-session retrieval and context packaging.
-- [ ] Define the structured decision schema: `approve`, `request_revision`, `escalate`.
-- [ ] Implement model output validation and cited-memory/cited-evidence rationale.
-- [ ] Add tests for recall, conflicting feedback, missing context, and malformed output.
-- [ ] Create the deletion-test script and document the expected degradation.
+- [x] Define the memory taxonomy and project-scoped identifiers.
+- [x] Implement real Sibyl writes for requirements, entities, feedback, evidence, decisions, and unresolved issues.
+- [x] Implement fresh-session retrieval and context packaging.
+- [x] Define the structured decision schema: `approve`, `request_revision`, `escalate`.
+- [x] Implement model output validation and cited-memory/cited-evidence rationale.
+- [x] Add tests for recall, conflicting feedback, missing context, and malformed output.
+- [x] Create the deletion-test script and document the expected degradation.
 
 **Done when:** A seeded project can be evaluated in a new session, and prior feedback changes the result with traceable memory references.
+
+**Status:** Complete in commit `2377a56`. The standalone suite has 8 passing tests, and `scripts/deletion_test.py` demonstrates that removing project memory changes the outcome.
 
 ### Contributor 2: Base Escrow and Safety
 
@@ -67,7 +69,7 @@ Each contributor should be able to finish and verify their work without waiting 
 ## Integration Milestones
 
 - [ ] **M0: Interface freeze (all):** agree on the JSON schemas, fixture format, and success criteria. This is a short coordination step, not a blocking implementation dependency.
-- [ ] **M1: Standalone completion (each contributor):** each workstream passes its own local verification using mocks or fixtures.
+- [ ] **M1: Standalone completion (each contributor):** Contributor 1 is complete; Contributors 2 and 3 still need their standalone verification.
 - [ ] **M2: Integration (all):** connect the three completed deliverables through the frozen interfaces.
 - [ ] **M3: Integrated demo (all):** fresh-session revision path, approval path, audit trail, and resettable seed.
 - [ ] **M4: Final verification (all):** tests, deletion test, adversarial cases, second-run test, and non-author setup walkthrough.

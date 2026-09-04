@@ -57,18 +57,30 @@ Return JSON matching this shape:
 
 Contributor 2 will consume this output later. Keep the schema stable and documented.
 
+## Implementation Status
+
+Complete in commit `2377a56`.
+
+- Real `sibyl-memory-client` integration is implemented in `src/guardian_memory/sibyl_store.py`.
+- Project-scoped records are persisted across Sibyl HOT, WARM, COLD, and REFERENCE tiers.
+- Fresh-session retrieval reads scoped Sibyl events and acceptance criteria.
+- The deterministic provider returns the stable decision contract until an LLM is selected.
+- A future API-key or SDK model can implement `ReasoningProvider` and be passed to `Guardian(..., reasoner=provider)`.
+- Eight tests pass, including approval, revision, escalation, contradictory feedback, malformed input, and empty-memory degradation.
+- `scripts/deletion_test.py` proves memory is load-bearing by comparing seeded and empty databases.
+
 ## First Implementation Order
 
-- [ ] Create the fixture JSON format and one seeded project.
-- [ ] Install and verify the official `sibyl-memory-client` package.
-- [ ] Create the memory adapter interface backed by a real local Sibyl database.
-- [ ] Implement memory writes and project-scoped retrieval.
-- [ ] Implement the decision schema and validator.
-- [ ] Implement the Guardian evaluation against the real Sibyl adapter and a temporary deterministic reasoning function.
-- [ ] Add the fresh-session recall test.
-- [ ] Add contradictory-feedback and missing-evidence tests.
-- [ ] Add the deletion test.
-- [ ] Document the real Sibyl integration points for later wiring.
+- [x] Create the fixture JSON format and one seeded project.
+- [x] Install and verify the official `sibyl-memory-client` package.
+- [x] Create the memory adapter interface backed by a real local Sibyl database.
+- [x] Implement memory writes and project-scoped retrieval.
+- [x] Implement the decision schema and validator.
+- [x] Implement the Guardian evaluation against the real Sibyl adapter and a temporary deterministic reasoning function.
+- [x] Add the fresh-session recall test.
+- [x] Add contradictory-feedback and missing-evidence tests.
+- [x] Add the deletion test.
+- [x] Document the real Sibyl integration points for later wiring.
 
 ## Definition of Done
 

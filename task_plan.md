@@ -33,17 +33,21 @@ Create a complete, implementation-ready PRD and a three-person execution board f
 
 ## Status
 
-**Ready for implementation** - Independent contributor workspaces, shared contracts, fixtures, and Contributor 1's real Sibyl implementation tasks are scaffolded below.
+**Contributor 1 complete; Contributors 2 and 3 pending** - The independent workspaces, shared contracts, fixtures, and the real Sibyl-backed Guardian workflow are implemented and verified. Integration remains gated on the other two standalone workstreams.
 
 ## Contributor 1 Implementation Tasks
 
-- [ ] Install and verify `sibyl-memory-client` from the official Sibyl package.
-- [ ] Define the project and milestone fixture schema.
-- [ ] Implement a real Sibyl-backed memory adapter using an isolated local database for tests.
-- [ ] Map requirements, entities, feedback, evidence, decisions, and unresolved issues to Sibyl tiers.
-- [ ] Implement project-scoped retrieval and bounded review-context assembly.
-- [ ] Define and validate the `approve` / `request_revision` / `escalate` decision JSON contract.
-- [ ] Add a temporary deterministic reasoning function so the memory workflow runs without an LLM.
-- [ ] Add fresh-session recall, contradictory-feedback, missing-evidence, and malformed-decision tests.
-- [ ] Add the deletion test proving the evaluation loses project-specific context without Sibyl Memory.
-- [ ] Document the future LLM provider interface and MCP/TypeScript integration boundary.
+- [x] Install and verify `sibyl-memory-client` from the official Sibyl package.
+- [x] Define the project and milestone fixture schema.
+- [x] Implement a real Sibyl-backed memory adapter using an isolated local database for tests.
+- [x] Map requirements, entities, feedback, evidence, decisions, and unresolved issues to Sibyl tiers.
+- [x] Implement project-scoped retrieval and bounded review-context assembly.
+- [x] Define and validate the `approve` / `request_revision` / `escalate` decision JSON contract.
+- [x] Add a temporary deterministic reasoning function so the memory workflow runs without an LLM.
+- [x] Add fresh-session recall, contradictory-feedback, missing-evidence, and malformed-decision tests.
+- [x] Add the deletion test proving the evaluation loses project-specific context without Sibyl Memory.
+- [x] Document the future LLM provider interface and MCP/TypeScript integration boundary.
+
+## Contributor 1 Completion
+
+Contributor 1 is complete in commit `2377a56`. The implementation uses the real Sibyl client, retrieves scoped event history through `read_events()`, validates the shared decision contract, and keeps the model provider replaceable through `ReasoningProvider`. Verification: 8 tests passed, Python compilation passed, CLI replay passed, and the deletion test confirmed a different outcome without memory.
