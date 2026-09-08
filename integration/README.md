@@ -10,12 +10,16 @@ The contributor packages are independent. Integration uses stable JSON files, no
 
 Contributor 1 is independently complete. From `contributors/contributor-1-guardian`, install with `python -m pip install -e ".[test]"`, run `python -m pytest -q`, and use `scripts/deletion_test.py` to demonstrate the memory-dependent outcome change. The output decision is validated against `shared/contracts/decision.schema.json`.
 
+Contributor 2 is independently complete. From `contributors/contributor-2-escrow`, run `npm install`, `npm run compile:contract`, `npm test`, and `npm run build` (39 passing tests, offline). The release path consumes a decision JSON plus an escrow fixture and emits a `policy-result.schema.json`-valid result; `npm run demo` runs the approve path against the mock. A Base Sepolia release additionally needs a faucet-funded test wallet in `.env` (see `contributors/contributor-2-escrow/README.md`).
+
 ## File Boundaries
 
 - Contributor 1 owns the `decision.schema.json` producer.
 - Contributor 2 owns the `policy-result.schema.json` producer.
 - Contributor 3 is a consumer of both schemas.
 - Shared fixtures are examples only; each contributor may create local fixtures without changing another contributor's implementation.
+
+The shared fixtures define the full integration story in order: `shared/fixtures/review-request-approved.json` -> `decision-approved.json` (produced by Contributor 1) -> `policy-result.schema.json` consumer output (produced by Contributor 2). `decision-revision.json` and `decision-escalate.json` exercise the non-release branches.
 
 ## Later Live Wiring
 

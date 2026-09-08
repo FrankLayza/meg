@@ -1,0 +1,8 @@
+{
+  "outcome": "request_revision",
+  "rationale": "accepted criteria include idempotency, and the cited evidence does not mention idempotent request keys; revise the API to add retries with idempotency keys.",
+  "confidence": 0.85,
+  "cited_memory_ids": ["criteria-001", "milestone-001-plan"],
+  "cited_evidence_ids": ["commit-abc123"],
+  "missing_information": ["Coverage of idempotent request keys in the submitted commit."]
+}

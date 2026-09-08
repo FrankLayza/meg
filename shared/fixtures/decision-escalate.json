@@ -1,0 +1,8 @@
+{
+  "outcome": "escalate",
+  "rationale": "The submitted evidence references a commit that has not been recalled from memory; escalation is required for manual arbitration.",
+  "confidence": 0.7,
+  "cited_memory_ids": ["criteria-001", "milestone-001-plan"],
+  "cited_evidence_ids": ["commit-missing-000"],
+  "missing_information": ["Confirmation that the referenced commit exists and is authorized."]
+}

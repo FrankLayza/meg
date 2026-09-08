@@ -20,16 +20,18 @@
 
 ### Contributor 2: Base Escrow and Safety
 
-- [ ] Choose and document the minimal Base Sepolia escrow contract/interface.
-- [ ] Implement read-only escrow state checks and transaction simulation.
-- [ ] Implement the deterministic policy gate around the Guardian result.
-- [ ] Enforce dispute, duplicate-release, amount-limit, evidence, and allowlist checks.
-- [ ] Add explicit user confirmation before release.
+- [x] Choose and document the minimal Base Sepolia escrow contract/interface.
+- [x] Implement read-only escrow state checks and transaction simulation.
+- [x] Implement the deterministic policy gate around the Guardian result.
+- [x] Enforce dispute, duplicate-release, amount-limit, evidence, and allowlist checks.
+- [x] Add explicit user confirmation before release.
 - [ ] Send one real testnet release and record receipt/transaction hash.
-- [ ] Add tests for approval, rejection, escalation, duplicate release, chain failure, and retry behavior.
-- [ ] Write the threat model and secret-handling instructions.
+- [x] Add tests for approval, rejection, escalation, duplicate release, chain failure, and retry behavior.
+- [x] Write the threat model and secret-handling instructions.
 
 **Done when:** Only a policy-approved milestone can release escrow, and the transaction is reproducible on Base Sepolia without exposing secrets.
+
+**Status:** Code complete and offline-verified in `contributors/contributor-2-escrow` (39 passing tests, clean `tsc` build, dry-run works for approve/revision/escalate against the mock). ABI generated via `solc`; `MilestoneEscrow` artifact in `dist/contracts/MilestoneEscrow.json`. Threat model in `contributors/contributor-2-escrow/docs/threat-model.md`. Open item: one real Base Sepolia release once the `.env` wallet is faucet-funded.
 
 ### Contributor 3: Product Surface, Demo, and Submission
 

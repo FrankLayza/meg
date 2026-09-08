@@ -1,9 +1,4 @@
-import type { EscrowState, GuardianDecision, PolicyResult } from "./types.js";
-
-export interface PolicyConfig {
-  maxAmount: bigint;
-  requireConfirmation: boolean;
-}
+import type { EscrowState, GuardianDecision, GuardianOutcome, PolicyConfig, PolicyResult } from "./types.js";
 
 export function evaluatePolicy(
   decision: GuardianDecision,
@@ -12,31 +7,50 @@ export function evaluatePolicy(
   confirmed: boolean,
 ): PolicyResult {
   if (decision.outcome !== "approve") {
-    return result(false, "Only an approved Guardian decision can release escrow.", decision.outcome, "hold");
+    return deny(decision.outcome, "hold", "Only an approved Guardian decision can release escrow.");
   }
   if (escrow.released) {
-    return result(false, "This milestone has already been released.", decision.outcome, "hold");
+    return deny(decision.outcome, "hold", "This milestone has already been released.");
+  }
+  if (!escrow.funded) {
+    return deny(decision.outcome, "hold", "The escrow has not been funded.");
   }
   if (escrow.disputeOpen) {
-    return result(false, "An open dispute blocks escrow release.", decision.outcome, "escalate");
+    return deny(decision.outcome, "escalate", "An open dispute blocks escrow release and requires human review.");
   }
   if (!escrow.evidencePresent) {
-    return result(false, "Evidence is required before release.", decision.outcome, "hold");
+    return deny(decision.outcome, "hold", "Evidence is required before release.");
   }
   if (escrow.amount > config.maxAmount) {
-    return result(false, "The milestone exceeds the configured release limit.", decision.outcome, "escalate");
+    return deny(decision.outcome, "escalate", "The milestone exceeds the configured release limit.");
+  }
+  if (!config.allowlistedContracts.includes(escrow.contract_address)) {
+    return deny(decision.outcome, "escalate", "The escrow contract is not allowlisted.");
   }
   if (config.requireConfirmation && !confirmed) {
-    return result(false, "Explicit user confirmation is required.", decision.outcome, "hold");
+    return deny(decision.outcome, "hold", "Explicit user confirmation is required.");
   }
-  return result(true, "Policy checks passed; escrow release may be sent.", decision.outcome, "release");
+  return {
+    allowed: true,
+    reason: "Policy checks passed; escrow release may be sent.",
+    decision_outcome: decision.outcome,
+    escrow_action: "release",
+    transaction_hash: null,
+    receipt_status: null,
+  };
 }
 
-function result(
-  allowed: boolean,
+export function deny(
+  decisionOutcome: GuardianOutcome,
+  escrowAction: PolicyResult["escrow_action"],
   reason: string,
-  decision_outcome: GuardianDecision["outcome"],
-  escrow_action: PolicyResult["escrow_action"],
 ): PolicyResult {
-  return { allowed, reason, decision_outcome, escrow_action, transaction_hash: null, receipt_status: null };
+  return {
+    allowed: false,
+    reason,
+    decision_outcome: decisionOutcome,
+    escrow_action: escrowAction,
+    transaction_hash: null,
+    receipt_status: null,
+  };
 }

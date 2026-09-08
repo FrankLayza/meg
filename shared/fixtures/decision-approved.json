@@ -1,0 +1,8 @@
+{
+  "outcome": "approve",
+  "rationale": "All acceptance criteria (retries, idempotency) are addressed by commit-def456 and all recalled acceptance criteria are met.",
+  "confidence": 0.9,
+  "cited_memory_ids": ["criteria-001", "milestone-001-plan"],
+  "cited_evidence_ids": ["commit-def456"],
+  "missing_information": []
+}
