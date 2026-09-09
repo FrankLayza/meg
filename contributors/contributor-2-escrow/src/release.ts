@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { deny, evaluatePolicy } from "./policy.js";
 import { validateDecision, validatePolicyResult } from "./validation.js";
 import type { EscrowClient } from "./escrow.js";
@@ -8,6 +9,7 @@ export interface ReleaseInput {
   escrow: EscrowState;
   config: PolicyConfig;
   confirmed: boolean;
+  dryRun?: boolean;
   actor: string;
   client: EscrowClient;
 }
@@ -56,7 +58,7 @@ export async function runRelease(input: ReleaseInput): Promise<ReleaseOutput> {
     }
   }
 
-  if (policy.allowed) {
+  if (policy.allowed && !input.dryRun) {
     try {
       const receipt = await input.client.release(state.milestoneId);
       policy = {
@@ -87,6 +89,8 @@ async function buildOutput(policy: PolicyResult, input: ReleaseInput, chainAmoun
     tx_hash: policy.transaction_hash,
     receipt_status: policy.receipt_status,
     policy_result: policy,
+    decision: input.decision,
+    input_hash: hashInput(input.decision, input.escrow),
     created_at: new Date().toISOString(),
   };
   return { policyResult: policy, escrowAction };
@@ -97,4 +101,12 @@ function describe(error: unknown): string {
     return error.message;
   }
   return String(error);
+}
+
+function hashInput(decision: GuardianDecision, escrow: EscrowState): string {
+  const canonical = JSON.stringify({
+    decision,
+    escrow: { ...escrow, amount: escrow.amount.toString() },
+  });
+  return createHash("sha256").update(canonical).digest("hex");
 }

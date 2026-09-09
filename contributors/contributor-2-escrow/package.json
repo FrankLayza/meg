@@ -9,7 +9,7 @@
     "compile:contract": "tsx scripts/compile-contract.ts",
     "escrow-release": "tsx --env-file-if-exists=.env src/cli.ts",
     "escrow:dry-run": "tsx --env-file-if-exists=.env src/cli.ts --dry-run",
-    "demo": "tsx --env-file-if-exists=.env src/cli.ts --dry-run --local --decision ..\\..\\shared\\fixtures\\decision-approved.json --escrow fixtures\\escrow-state.example.json",
+    "demo": "tsx --env-file-if-exists=.env src/cli.ts --dry-run --local --allowlist 0x1111111111111111111111111111111111111111 --decision ..\\..\\shared\\fixtures\\decision-approved.json --escrow fixtures\\escrow-state.example.json",
     "escrow:deploy": "tsx --env-file-if-exists=.env scripts/deploy-escrow.ts",
     "escrow:fund": "tsx --env-file-if-exists=.env scripts/fund-escrow.ts"
   },

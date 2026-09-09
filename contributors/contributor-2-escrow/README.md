@@ -29,7 +29,7 @@ All three decision outcomes are covered by fixtures and fail-closed paths:
 
 ```bash
 # approve -> release (mock receipt), request_revision -> hold, escalate -> hold
-tsx src/cli.ts --dry-run --local --yes --decision ..\..\shared\fixtures\decision-approved.json --escrow fixtures\escrow-state.example.json
+tsx src/cli.ts --dry-run --local --yes --allowlist 0x1111111111111111111111111111111111111111 --decision ..\..\shared\fixtures\decision-approved.json --escrow fixtures\escrow-state.example.json
 ```
 
 ## Release on Base Sepolia
@@ -47,6 +47,6 @@ See `docs/threat-model.md`. Key points: fail-closed on every chain/validation er
 
 ## Interface
 
-- Input: decision JSON (`shared/contracts/decision.schema.json`), escrow fixture `{ milestoneId, contract_address, amount, evidencePresent }`.
+- Input: decision JSON (`shared/contracts/decision.schema.json`), escrow fixture `{ milestoneId, contract_address, amount, evidencePresent }`. The contract must be explicitly allowlisted; an absent allowlist denies release.
 - Output: `policyResult` (schema-validated against `policy-result.schema.json`) + `escrowAction` audit record.
 - Independent of Contributor 1's runtime; consumes only the frozen JSON contract.

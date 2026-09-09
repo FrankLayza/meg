@@ -203,3 +203,28 @@ test("#given a malformed decision, #when run, #then it fails closed and throws",
     InvalidDecisionError,
   );
 });
+
+test("#given a confirmed approval in dry-run mode, #when run, #then it simulates without sending", async () => {
+  const client = new MockEscrowClient();
+  const output = await runRelease({
+    decision: makeDecision(), escrow: makeEscrow(), config: makeConfig(),
+    confirmed: true, dryRun: true, actor: "demo-user", client,
+  });
+  assert.equal(output.policyResult.allowed, true);
+  assert.equal(output.policyResult.transaction_hash, null);
+  assert.equal(client.releaseCalls, 0);
+  assert.equal(output.escrowAction.input_hash.length, 64);
+  assert.deepEqual(output.escrowAction.decision, makeDecision());
+});
+
+test("#given an approved decision with missing information, #when run, #then it holds without sending", async () => {
+  const client = new MockEscrowClient();
+  const output = await runRelease({
+    decision: makeDecision({ missing_information: ["Acceptance criterion status"] }),
+    escrow: makeEscrow(), config: makeConfig(), confirmed: true, actor: "demo-user", client,
+  });
+  assert.equal(output.policyResult.allowed, false);
+  assert.equal(output.policyResult.escrow_action, "hold");
+  assert.match(output.policyResult.reason, /mandatory acceptance criteria/i);
+  assert.equal(client.releaseCalls, 0);
+});

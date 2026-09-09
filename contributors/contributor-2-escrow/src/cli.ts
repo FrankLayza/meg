@@ -60,7 +60,10 @@ if (args.help || !args.decision || !args.escrow) {
   process.exit(args.help ? 0 : 2);
 }
 
-await main();
+main().catch((error: unknown) => {
+  console.error(error instanceof Error ? error.message : String(error));
+  process.exitCode = 1;
+});
 
 async function main(): Promise<void> {
   const decision = await readJson<GuardianDecision>(resolve(args.decision));
@@ -72,7 +75,7 @@ async function main(): Promise<void> {
   }>(resolve(args.escrow));
 
   const contractAddress = args.contract ?? process.env.ESCROW_CONTRACT_ADDRESS ?? escrowFixture.contract_address;
-  const allowlist = args.allowlist.length > 0 ? args.allowlist : splitEnvList(process.env.ESCROW_ALLOWLIST, contractAddress);
+  const allowlist = args.allowlist.length > 0 ? args.allowlist : splitEnvList(process.env.ESCROW_ALLOWLIST);
   const maxAmount = parseAmount(args.maxAmount ?? process.env.ESCROW_MAX_AMOUNT_WEI ?? FIRST_ETHER.toString());
 
   const escrow = {
@@ -99,6 +102,7 @@ async function main(): Promise<void> {
     escrow,
     config,
     confirmed,
+    dryRun: args.dryRun,
     actor: args.actor,
     client,
   });
@@ -145,11 +149,11 @@ function readString(value: string | boolean | undefined): string {
   return "";
 }
 
-function splitEnvList(value: string | undefined, fallback: string): string[] {
+function splitEnvList(value: string | undefined): string[] {
   if (value && value.trim().length > 0) {
     return value.split(",").map((item) => item.trim()).filter(Boolean);
   }
-  return [fallback];
+  return [];
 }
 
 function parseAmount(value: string): bigint {
@@ -178,7 +182,7 @@ function printUsage(): void {
       "      --yes               Skip the interactive confirmation prompt.",
       "      --max-amount <wei>  Deterministic release cap (default: 1 ether or ESCROW_MAX_AMOUNT_WEI).",
       "      --contract <addr>   Escrow contract address (default: ESCROW_CONTRACT_ADDRESS | fixture).",
-      "      --allowlist <csv>   Allowed contract addresses (comma separated; default: ESCROW_ALLOWLIST | contract).",
+      "      --allowlist <csv>   Allowed contract addresses (comma separated; default: ESCROW_ALLOWLIST; absent means deny).",
       "      --actor <name>      Audit actor label recorded in the EscrowActionRecord.",
       "      --out <path>        Write the policy result + action record JSON to a file.",
       "  -h, --help              Show this help.",
