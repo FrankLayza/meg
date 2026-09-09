@@ -1,3 +1,5 @@
+import json
+import os
 import re
 from typing import Mapping, Protocol, Sequence
 
@@ -120,3 +122,91 @@ class DeterministicReasoner:
             ):
                 conflicts.append(record_id)
         return conflicts
+
+
+class GroqReasoner:
+    """ReasoningProvider backed by a Groq-hosted model.
+
+    Evidence is serialised as structured JSON in the user message, not
+    interpolated as free text, to reduce prompt-injection surface.
+    The model output is validated downstream by decision_from_dict, so
+    any schema violation surfaces as a ValueError before it reaches the
+    policy gate.
+    """
+
+    _SYSTEM_PROMPT = (
+        "You are a Guardian evaluating a software milestone deliverable.\n"
+        "You will receive a JSON object with two keys:\n"
+        "  context  - the project history recalled from memory (criteria, feedback, unresolved issues, prior decisions)\n"
+        "  evidence - the evidence items submitted for this milestone\n"
+        "Return ONLY a single JSON object with exactly these keys:\n"
+        '{\n'
+        '  "outcome": "approve" | "request_revision" | "escalate",\n'
+        '  "rationale": "<non-empty string explaining your decision>",\n'
+        '  "confidence": <float between 0.0 and 1.0>,\n'
+        '  "cited_memory_ids": ["<id>", ...],\n'
+        '  "cited_evidence_ids": ["<id>", ...],\n'
+        '  "missing_information": ["<item>", ...]\n'
+        '}\n'
+        "Do not output anything outside that JSON object."
+    )
+
+    def __init__(
+        self,
+        api_key: str | None = None,
+        model: str = "openai/gpt-oss-120b",
+        reasoning_effort: str = "medium",
+    ) -> None:
+        # Import deferred so the package stays runnable without groq installed.
+        from groq import Groq  # type: ignore[import-untyped]
+
+        self._client = Groq(api_key=api_key or os.environ["GROQ_API_KEY"])
+        self._model = model
+        self._reasoning_effort = reasoning_effort
+
+    def evaluate(self, context: Mapping[str, object], evidence: Sequence[Evidence]) -> Mapping[str, object]:
+        payload = json.dumps(
+            {
+                "context": dict(context),
+                # Evidence passed as structured fields only — never raw locator strings
+                # that could contain injected instructions (see PRD §13).
+                "evidence": [
+                    {"id": e.id, "type": e.type, "summary": e.summary}
+                    for e in evidence
+                ],
+            },
+            sort_keys=True,
+        )
+        response = self._client.chat.completions.create(
+            model=self._model,
+            messages=[
+                {"role": "system", "content": self._SYSTEM_PROMPT},
+                {"role": "user", "content": payload},
+            ],
+            temperature=1,
+            max_completion_tokens=2048,
+            top_p=1,
+            reasoning_effort=self._reasoning_effort,
+            stream=False,
+        )
+        raw = response.choices[0].message.content or ""
+        return self._parse_json(raw)
+
+    @staticmethod
+    def _parse_json(raw: str) -> dict[str, object]:
+        """Extract the JSON object from the model reply.
+
+        Reasoning models sometimes wrap output in markdown fences; strip
+        them before parsing so decision_from_dict validation still catches
+        any schema problems.
+        """
+        stripped = raw.strip()
+        # Remove optional ```json ... ``` wrapper.
+        fence_match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", stripped, re.DOTALL)
+        if fence_match:
+            stripped = fence_match.group(1)
+        # Find the outermost { ... } block if there is any preamble.
+        brace_match = re.search(r"\{.*\}", stripped, re.DOTALL)
+        if brace_match:
+            stripped = brace_match.group(0)
+        return json.loads(stripped)

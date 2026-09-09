@@ -1,14 +1,22 @@
+import os
 from typing import Mapping
 
 from .models import Decision, ReviewRequest, decision_from_dict
-from .reasoning import DeterministicReasoner, ReasoningProvider
+from .reasoning import DeterministicReasoner, GroqReasoner, ReasoningProvider
 from .sibyl_store import SibylStore
+
+
+def _default_reasoner() -> ReasoningProvider:
+    """Pick GroqReasoner when GROQ_API_KEY is present, otherwise fall back to DeterministicReasoner."""
+    if os.environ.get("GROQ_API_KEY"):
+        return GroqReasoner()
+    return DeterministicReasoner()
 
 
 class Guardian:
     def __init__(self, store: SibylStore, reasoner: ReasoningProvider | None = None) -> None:
         self._store = store
-        self._reasoner = reasoner or DeterministicReasoner()
+        self._reasoner = reasoner if reasoner is not None else _default_reasoner()
 
     def seed(self, request: ReviewRequest) -> None:
         self._store.seed_project(request)
