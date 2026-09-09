@@ -18,11 +18,11 @@ Deterministic policy gate + Base Sepolia escrow release. Consumes Contributor 1'
 ## Verify (offline)
 
 ```bash
-npm install
-npm run compile:contract
-npm test        # 39 tests
-npm run build   # tsc -p tsconfig.json
-npm run demo    # approve path vs MockEscrowClient (dry-run)
+pnpm install
+pnpm run compile:contract
+pnpm test        # 41 tests
+pnpm run build   # tsc -p tsconfig.json
+pnpm run demo    # approve path vs MockEscrowClient (dry-run)
 ```
 
 All three decision outcomes are covered by fixtures and fail-closed paths:
@@ -35,9 +35,9 @@ tsx src/cli.ts --dry-run --local --yes --allowlist 0x111111111111111111111111111
 ## Release on Base Sepolia
 
 1. Copy `.env.example` to `.env`; fund the test wallet via a Base Sepolia faucet.
-2. Deploy: `npm run escrow:deploy` -> put the printed address in `.env` (`ESCROW_CONTRACT_ADDRESS` and `ESCROW_ALLOWLIST`).
-3. Fund: `npm run escrow:fund -- --milestone milestone-001 --freelancer 0x...` (then read the state with `--local` off).
-4. Release: `npm run escrow:release` (or `tsx src/cli.ts --decision <decision.json> --escrow fixtures\escrow-state.example.json`). It prompts `[y/N]` unless `--yes`; never runs on untested amounts.
+2. Deploy: `pnpm run escrow:deploy` -> put the printed address in `.env` (`ESCROW_CONTRACT_ADDRESS` and `ESCROW_ALLOWLIST`).
+3. Fund: `pnpm run escrow:fund -- --milestone milestone-001 --amount 100000000000000000 --freelancer 0x...` (then read the state with `--local` off).
+4. Release: `pnpm run escrow:release` (or `tsx src/cli.ts --decision <decision.json> --escrow fixtures\escrow-state.example.json`). It prompts `[y/N]` unless `--yes`; never runs on untested amounts.
 
 Recorded tx hashes are on Basescan: `https://sepolia.basescan.org/tx/<hash>`.
 
