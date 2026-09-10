@@ -16,6 +16,17 @@ guardian-review ..\..\shared\fixtures\review-request-missing-idempotency.json --
 
 The `--seed` run stores requirements and feedback in Sibyl. A later run against the same database represents a fresh session and retrieves the stored context.
 
+To hand the validated decision directly to Contributor 2, write it to a JSON file:
+
+```powershell
+guardian-review ..\..\shared\fixtures\review-request-approved.json `
+  --database .sibyl-memory\guardian.db `
+  --reasoner groq `
+  --output ..\..\shared\fixtures\decision-live.json
+```
+
+Contributor 2 consumes that file with its existing `--decision` option. The output is validated by `decision_from_dict` before it is written.
+
 ## Verification
 
 Run the standalone suite with the workspace virtual environment:
