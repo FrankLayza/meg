@@ -40,6 +40,7 @@ contract MilestoneEscrow {
     }
 
     function fund(bytes32 milestoneKey) external payable {
+        if (escrows[milestoneKey].released) revert AlreadyReleased(milestoneKey);
         if (msg.value == 0) revert NoValue();
         Escrow storage escrow = escrows[milestoneKey];
         if (!escrow.funded) {

@@ -53,5 +53,7 @@ export interface EscrowActionRecord {
   tx_hash: string | null;
   receipt_status: string | null;
   policy_result: PolicyResult;
+  decision: GuardianDecision;
+  input_hash: string;
   created_at: string;
 }

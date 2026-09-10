@@ -9,6 +9,9 @@ export function evaluatePolicy(
   if (decision.outcome !== "approve") {
     return deny(decision.outcome, "hold", "Only an approved Guardian decision can release escrow.");
   }
+  if (decision.missing_information.length > 0) {
+    return deny(decision.outcome, "hold", "All mandatory acceptance criteria must be addressed before release.");
+  }
   if (escrow.released) {
     return deny(decision.outcome, "hold", "This milestone has already been released.");
   }

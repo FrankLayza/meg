@@ -11,6 +11,7 @@ dependencies = ["sibyl-memory-client"]
 
 [project.optional-dependencies]
 test = ["pytest>=8"]
+llm = ["groq>=0.11"]
 
 [project.scripts]
 guardian-review = "guardian_memory.cli:main"
