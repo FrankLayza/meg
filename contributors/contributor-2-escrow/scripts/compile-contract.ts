@@ -31,7 +31,10 @@ const input = {
 };
 
 const output = JSON.parse(solc.compile(JSON.stringify(input))) as {
-  contracts?: Record<string, Record<string, { abi: unknown }>>;
+  contracts?: Record<
+    string,
+    Record<string, { abi: unknown; evm: { bytecode: { object: string } } }>
+  >;
   errors?: Array<{ severity: string; formattedMessage: string }>;
 };
 
