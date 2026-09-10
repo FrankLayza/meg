@@ -1,0 +1,30 @@
+{
+  "policyResult": {
+    "allowed": true,
+    "reason": "Policy checks passed; escrow release may be sent.",
+    "decision_outcome": "approve",
+    "escrow_action": "release",
+    "transaction_hash": "mock-milestone-001-1",
+    "receipt_status": "confirmed"
+  },
+  "escrowAction": {
+    "action": "release",
+    "chain": "base_sepolia",
+    "contract_address": "0x1111111111111111111111111111111111111111",
+    "milestone_id": "milestone-001",
+    "amount": "100000000000000000",
+    "actor": "cli-user",
+    "tx_hash": "mock-milestone-001-1",
+    "receipt_status": "confirmed",
+    "policy_result": {
+      "allowed": true,
+      "reason": "Policy checks passed; escrow release may be sent.",
+      "decision_outcome": "approve",
+      "escrow_action": "release",
+      "transaction_hash": "mock-milestone-001-1",
+      "receipt_status": "confirmed"
+    },
+    "created_at": "2026-09-10T13:22:58.988Z"
+  },
+  "dry_run": true
+}

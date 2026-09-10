@@ -1,0 +1,17 @@
+{
+  "outcome": "approve",
+  "rationale": "The submission addresses the requirements recalled from the project history.",
+  "confidence": 0.86,
+  "cited_memory_ids": [
+    "criteria",
+    "feedback-001",
+    "feedback-001",
+    "feedback-001",
+    "feedback-001",
+    "feedback-001"
+  ],
+  "cited_evidence_ids": [
+    "commit-def456"
+  ],
+  "missing_information": []
+}

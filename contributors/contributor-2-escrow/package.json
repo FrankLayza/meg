@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "tsx --test src/*.test.ts",
+    "test": "tsx --test src/base-escrow.test.ts src/escrow.test.ts src/policy.test.ts src/release.test.ts src/validation.test.ts",
     "compile:contract": "tsx scripts/compile-contract.ts",
     "escrow-release": "tsx --env-file-if-exists=.env src/cli.ts",
     "escrow:dry-run": "tsx --env-file-if-exists=.env src/cli.ts --dry-run",

@@ -1,0 +1,15 @@
+{
+  "outcome": "request_revision",
+  "rationale": "The submission does not address all requirements recalled from the project history.",
+  "confidence": 0.9,
+  "cited_memory_ids": [
+    "criteria",
+    "feedback-001"
+  ],
+  "cited_evidence_ids": [
+    "commit-abc123"
+  ],
+  "missing_information": [
+    "API requests must be idempotent"
+  ]
+}

@@ -5,7 +5,14 @@
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "demo": "tsx src/demo.ts"
+    "test": "tsx --test src/formatters.test.ts src/scenarios.test.ts",
+    "demo": "tsx src/cli.ts",
+    "demo:walkthrough": "tsx src/cli.ts --walkthrough",
+    "demo:revision": "tsx src/cli.ts --scenario revision",
+    "demo:approved": "tsx src/cli.ts --scenario approved",
+    "demo:escalated": "tsx src/cli.ts --scenario escalated",
+    "demo:reset": "tsx src/cli.ts --reset",
+    "serve": "tsx src/server.ts"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Milestone-Escrow Guardian | Sibyl Memory + Base Sepolia</title>
+  <meta name="description" content="Auditable memory-backed escrow mediator: Recalls project context via Sibyl Memory, audits deliverables, and enforces deterministic policy before executing on Base Sepolia.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Top Global App Bar -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="app-icon-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+        <div class="header-brand-info">
+          <h1 class="header-app-title">Guardian</h1>
+          <span class="header-app-sub">Milestone Escrow</span>
+        </div>
+      </div>
+
+      <div class="header-center">
+        <div class="project-pill">
+          <span class="project-dot"></span>
+          <span class="project-name" id="topNavProject">project-001</span>
+          <span class="milestone-badge" id="topNavMilestone">milestone-001</span>
+        </div>
+        <nav class="desktop-header-nav" aria-label="Desktop Navigation">
+          <button class="d-nav-btn active" data-nav="overview">Overview</button>
+          <button class="d-nav-btn" data-nav="scenarios">Scenarios</button>
+          <button class="d-nav-btn" data-nav="memory">Memory</button>
+          <button class="d-nav-btn" data-nav="policy">Policy</button>
+          <button class="d-nav-btn" data-nav="escrow">Escrow</button>
+        </nav>
+      </div>
+
+      <div class="header-right">
+        <a class="chain-pill" href="https://sepolia.basescan.org" target="_blank" rel="noopener noreferrer" title="View Base Sepolia Network on Explorer">
+          <span class="chain-dot"></span>
+          <span class="chain-name">Base Sepolia</span>
+        </a>
+        <a class="explorer-link-pill" href="https://sepolia.basescan.org" target="_blank" rel="noopener noreferrer" title="Open Basescan Explorer">
+          <span>Basescan</span>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+        </a>
+        <button class="avatar-chip" id="copyContractBtn" title="Copy Escrow Contract Address">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Flow -->
+    <main class="app-main-content">
+      <!-- Search & Verification Bar -->
+      <section class="search-action-strip">
+        <div class="search-input-wrap">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" class="search-input" id="searchInput" placeholder="Search milestone criteria, commit SHAs, or memories..." readonly value="Milestone-001: API Architecture, Retries & Idempotency">
+        </div>
+        <button class="sim-open-btn" id="openSimulateBtn" title="Test custom deliverables against Sibyl Memory & Base Policy">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          <span>⚡ Test Deliverable</span>
+        </button>
+        <button class="verify-action-btn" id="runTestBtn" title="Re-verify Deterministic Invariants">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="4" y1="21" x2="4" y2="14"></line>
+            <line x1="4" y1="10" x2="4" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12" y2="3"></line>
+            <line x1="20" y1="21" x2="20" y2="16"></line>
+            <line x1="20" y1="12" x2="20" y2="3"></line>
+            <line x1="1" y1="14" x2="7" y2="14"></line>
+            <line x1="9" y1="8" x2="15" y2="8"></line>
+            <line x1="17" y1="16" x2="23" y2="16"></line>
+          </svg>
+        </button>
+      </section>
+
+      <!-- Section: Scenario Cards Carousel ("Milestone Reviews") -->
+      <section class="section-container">
+        <div class="section-title-row">
+          <h2 class="section-title">Review Scenarios</h2>
+          <span class="section-subtitle">Click to switch context</span>
+        </div>
+
+        <div class="scenario-carousel" id="scenarioCarousel">
+          <!-- Card 1: Revision Required -->
+          <div class="scenario-card active" data-scenario="revision" id="card-revision">
+            <div class="scenario-card-head">
+              <div class="scenario-avatar bg-peach">
+                <span>01</span>
+              </div>
+              <div class="scenario-meta">
+                <span class="scenario-session">Session 2 • Fresh Recall</span>
+                <span class="scenario-name">Revision Required</span>
+              </div>
+              <div class="scenario-tag tag-peach">HOLD</div>
+            </div>
+            <div class="scenario-details">
+              <div class="scenario-phase-text">Backer feedback recalled from Sibyl: missing idempotency detected in commit.</div>
+              <div class="scenario-checks">
+                <span class="check-pill fail">✕ Missing Idempotency</span>
+                <span class="check-pill pass">✓ Retries Added</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Milestone Resolved -->
+          <div class="scenario-card" data-scenario="approved" id="card-approved">
+            <div class="scenario-card-head">
+              <div class="scenario-avatar bg-mint">
+                <span>02</span>
+              </div>
+              <div class="scenario-meta">
+                <span class="scenario-session">Session 3 • Resolved</span>
+                <span class="scenario-name">Milestone Released</span>
+              </div>
+              <div class="scenario-tag tag-mint">RELEASED</div>
+            </div>
+            <div class="scenario-details">
+              <div class="scenario-phase-text">Revised commit def456 satisfies all criteria; Base Sepolia release authorized.</div>
+              <div class="scenario-checks">
+                <span class="check-pill pass">✓ Idempotency Key</span>
+                <span class="check-pill pass">✓ Retry Policy</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Safety & Escalation -->
+          <div class="scenario-card" data-scenario="escalated" id="card-escalated">
+            <div class="scenario-card-head">
+              <div class="scenario-avatar bg-rose">
+                <span>03</span>
+              </div>
+              <div class="scenario-meta">
+                <span class="scenario-session">Safety Invariant Gate</span>
+                <span class="scenario-name">Human Escalation</span>
+              </div>
+              <div class="scenario-tag tag-rose">DISPUTE</div>
+            </div>
+            <div class="scenario-details">
+              <div class="scenario-phase-text">Simulates memory wipe or dispute; policy refuses release and halts funds.</div>
+              <div class="scenario-checks">
+                <span class="check-pill fail">✕ Open Dispute</span>
+                <span class="check-pill pass">✓ Zero-Trust Lock</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 4: Interactive Test Sandbox -->
+          <div class="scenario-card" data-scenario="simulated" id="card-simulated">
+            <div class="scenario-card-head">
+              <div class="scenario-avatar bg-lavender">
+                <span>⚡</span>
+              </div>
+              <div class="scenario-meta">
+                <span class="scenario-session">Test Sandbox</span>
+                <span class="scenario-name" id="cardSimName">Simulate Custom</span>
+              </div>
+              <div class="scenario-tag tag-lavender" id="cardSimTag">SANDBOX</div>
+            </div>
+            <div class="scenario-details">
+              <div class="scenario-phase-text" id="cardSimDesc">Test custom criteria, commit SHAs, retries, or disputes live.</div>
+              <div class="scenario-checks" id="cardSimChecks">
+                <span class="check-pill pass">⚡ Click to Test</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Key Hero Cards Grid (AI Verdict & Confidence Meter) -->
+      <section class="hero-cards-grid">
+        <!-- Hero Card 1: Guardian AI Verdict & Circular Confidence -->
+        <article class="content-card verdict-hero-card">
+          <div class="verdict-hero-left">
+            <div class="pill-category" id="sessionBadge">SESSION 2 (FRESH RECALL)</div>
+            <h3 class="verdict-hero-title" id="scenarioTitle">Fresh-Session Recall: Revision Required</h3>
+            <p class="verdict-hero-desc" id="scenarioDesc">Recalls backer critique from Session 1 stored in Sibyl Memory and detects missing idempotency. Denies release without moving funds.</p>
+
+            <div class="verdict-action-strip">
+              <span class="status-pill-badge" id="verdictPill">REVISION REQUIRED</span>
+              <span class="policy-result-pill" id="gatePill">BLOCKED • HOLD</span>
+            </div>
+
+            <!-- Model Rationale Callout -->
+            <div class="rationale-callout">
+              <div class="callout-label">Reasoning Engine Analysis</div>
+              <p class="callout-text" id="rationaleText">Deliverable adds API endpoints, but lacks required retry logic and idempotency guarantees explicitly requested by stakeholder feedback (feedback-001).</p>
+            </div>
+
+            <!-- Missing Info / Gaps (if any) -->
+            <div class="missing-items-box" id="missingInfoGroup">
+              <div class="missing-title">Required Revisions Before Release</div>
+              <ul class="missing-items-list" id="missingList">
+                <!-- Dynamically populated -->
+              </ul>
+            </div>
+          </div>
+
+          <!-- Circular Confidence Meter -->
+          <div class="verdict-hero-right">
+            <div class="confidence-circle-wrap">
+              <svg class="circle-svg" viewBox="0 0 120 120">
+                <circle class="circle-bg" cx="60" cy="60" r="50"></circle>
+                <circle class="circle-progress" id="circleProgress" cx="60" cy="60" r="50"></circle>
+              </svg>
+              <div class="circle-content">
+                <span class="circle-val" id="confidenceVal">95%</span>
+                <span class="circle-label">Confidence</span>
+              </div>
+            </div>
+            <span class="confidence-caption">Advisory Layer</span>
+            <span class="confidence-subcaption">Non-Authoritative</span>
+          </div>
+        </article>
+
+        <!-- Hero Card 2: 5-Stage Verification Telemetry Bars -->
+        <article class="content-card stages-chart-card">
+          <div class="chart-header">
+            <div>
+              <h3 class="card-heading">Verification Pipeline</h3>
+              <span class="card-subheading">End-to-end milestone execution guarantee</span>
+            </div>
+            <div class="escrow-locked-chip">
+              <span class="locked-lbl">Vault</span>
+              <span class="locked-val" id="escrowAmountVal">0.01 ETH</span>
+            </div>
+          </div>
+
+          <!-- 5 Vertical Bars representing stages -->
+          <div class="pipeline-bars-container">
+            <div class="bar-col">
+              <div class="bar-track">
+                <div class="bar-fill bar-mint" style="height: 100%;"></div>
+              </div>
+              <span class="bar-val">100%</span>
+              <span class="bar-name">1. Sibyl</span>
+            </div>
+
+            <div class="bar-col">
+              <div class="bar-track">
+                <div class="bar-fill bar-mint" style="height: 100%;"></div>
+              </div>
+              <span class="bar-val">100%</span>
+              <span class="bar-name">2. Ingest</span>
+            </div>
+
+            <div class="bar-col">
+              <div class="bar-track">
+                <div class="bar-fill bar-peach" id="barStage3" style="height: 95%;"></div>
+              </div>
+              <span class="bar-val" id="barValStage3">95%</span>
+              <span class="bar-name">3. AI Eval</span>
+            </div>
+
+            <div class="bar-col">
+              <div class="bar-track">
+                <div class="bar-fill bar-mint" id="barStage4" style="height: 100%;"></div>
+              </div>
+              <span class="bar-val" id="barValStage4">Pass</span>
+              <span class="bar-name">4. Policy</span>
+            </div>
+
+            <div class="bar-col">
+              <div class="bar-track">
+                <div class="bar-fill bar-peach" id="barStage5" style="height: 35%;"></div>
+              </div>
+              <span class="bar-val" id="barValStage5">Hold</span>
+              <span class="bar-name">5. Base</span>
+            </div>
+          </div>
+
+          <div class="chart-footer-note">
+            <span class="dot-indicator pulse"></span>
+            <span>Invariant Guard Active: LLM cannot touch private keys or move funds.</span>
+          </div>
+        </article>
+      </section>
+
+      <!-- Section: Two-Column Modular Details Grid -->
+      <section class="modular-grid">
+        <!-- LEFT COLUMN: Sibyl Memory & Deliverable Dossier -->
+        <div class="modular-col">
+          <!-- Card: Sibyl Memory Tiers (4 Squircles) -->
+          <article class="content-card">
+            <div class="card-header-simple">
+              <h3 class="card-heading">Recalled Sibyl Context</h3>
+              <span class="badge-tag tag-lavender">SQLite FTS5</span>
+            </div>
+
+            <!-- 4 Squircle Category Cards -->
+            <div class="squircles-grid">
+              <div class="squircle-item">
+                <div class="squircle-icon bg-rose-subtle">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                  </svg>
+                </div>
+                <span class="squircle-title">HOT</span>
+                <span class="squircle-sub">Review State</span>
+              </div>
+
+              <div class="squircle-item">
+                <div class="squircle-icon bg-amber-subtle">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                </div>
+                <span class="squircle-title">WARM</span>
+                <span class="squircle-sub">Project Entity</span>
+              </div>
+
+              <div class="squircle-item">
+                <div class="squircle-icon bg-mint-subtle">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2">
+                    <polyline points="9 11 12 14 22 4"></polyline>
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                  </svg>
+                </div>
+                <span class="squircle-title">REFERENCE</span>
+                <span class="squircle-sub">Milestone Specs</span>
+              </div>
+
+              <div class="squircle-item">
+                <div class="squircle-icon bg-lavender-subtle">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 14 14"></polyline>
+                  </svg>
+                </div>
+                <span class="squircle-title">COLD</span>
+                <span class="squircle-sub">Chat & Events</span>
+              </div>
+            </div>
+
+            <!-- Acceptance Criteria Checklist -->
+            <div class="sub-dossier-block">
+              <span class="dossier-label">Accepted Milestone Criteria [REFERENCE]</span>
+              <ul class="clean-check-list" id="criteriaList">
+                <!-- Dynamically populated -->
+              </ul>
+            </div>
+
+            <!-- Stakeholder Feedback -->
+            <div class="sub-dossier-block">
+              <span class="dossier-label">Historical Feedback on Record [COLD]</span>
+              <div class="feedback-bubbles" id="feedbackStack">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- Unresolved Disputes -->
+            <div class="sub-dossier-block" id="unresolvedGroup" style="display: none;">
+              <span class="dossier-label text-rose">Active Disputes on Record</span>
+              <div class="unresolved-box-clean" id="unresolvedBox"></div>
+            </div>
+          </article>
+
+          <!-- Card: Submitted Deliverable Evidence -->
+          <article class="content-card">
+            <div class="card-header-simple">
+              <h3 class="card-heading">Submitted Deliverable</h3>
+              <span class="badge-tag tag-peach">Untrusted Ingest</span>
+            </div>
+
+            <div class="evidence-bubbles" id="evidenceStack">
+              <!-- Dynamically populated -->
+            </div>
+
+            <div class="untrusted-security-notice">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <span>Code diffs and git commits are treated as untrusted data; strictly isolated from prompt logic.</span>
+            </div>
+          </article>
+        </div>
+
+        <!-- RIGHT COLUMN: Deterministic Policy Gate & Base Sepolia Escrow -->
+        <div class="modular-col">
+          <!-- Card: Deterministic Policy Gate Checklist -->
+          <article class="content-card">
+            <div class="card-header-simple">
+              <div>
+                <h3 class="card-heading">Deterministic Policy Gate</h3>
+                <span class="card-subheading">Mathematical invariant verification</span>
+              </div>
+              <span class="badge-tag tag-mint">Zero-Trust Guard</span>
+            </div>
+
+            <div class="policy-banner-clean" id="gateBanner">
+              <span class="policy-badge" id="gatePillSecondary">BLOCKED • HOLD</span>
+              <span class="policy-reason" id="gateReason">Review outcome requested revisions before release.</span>
+            </div>
+
+            <div class="policy-checks-clean" id="policyChecksTable">
+              <!-- Dynamically populated -->
+            </div>
+          </article>
+
+          <!-- Card: Base Sepolia Escrow Smart Contract Execution -->
+          <article class="content-card onchain-card-highlight">
+            <div class="card-header-simple">
+              <div>
+                <h3 class="card-heading">Base Sepolia Escrow</h3>
+                <span class="card-subheading">Native ETH Smart Contract Settlement</span>
+              </div>
+              <span class="badge-tag tag-blue">Base Sepolia</span>
+            </div>
+
+            <div class="onchain-specs-list">
+              <div class="onchain-spec-item">
+                <span class="spec-label">Smart Contract Method</span>
+                <code class="spec-code">MilestoneEscrow.release(bytes32 milestoneKey)</code>
+              </div>
+
+              <div class="onchain-spec-item">
+                <span class="spec-label">Contract Address</span>
+                <div class="spec-row-with-copy">
+                  <a class="spec-code-link" id="contractAddressLink" href="https://sepolia.basescan.org/address/0x633FB55E57c8d93f77E09a130983d544ff875e76" target="_blank" rel="noopener noreferrer" title="View contract on Basescan Explorer">
+                    <code class="spec-code" id="contractAddress">0x633FB55E57c8d93f77E09a130983d544ff875e76</code>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <polyline points="15 3 21 3 21 9"></polyline>
+                      <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                  </a>
+                  <button class="small-icon-btn" data-copy="contractAddress" title="Copy Address">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="onchain-spec-item">
+                <span class="spec-label">Transaction Status</span>
+                <span class="spec-status-text" id="escrowReceiptVal">HOLD (FUNDS LOCKED)</span>
+              </div>
+
+              <div class="onchain-spec-item">
+                <span class="spec-label">Transaction Hash</span>
+                <div class="spec-row-with-copy">
+                  <code class="spec-code" id="txHashVal">None (Escrow funds remain untouched in smart contract)</code>
+                </div>
+              </div>
+            </div>
+
+            <!-- Primary Action Button: Basescan CTA -->
+            <div class="onchain-cta-wrap" id="explorerLinkWrap">
+              <button class="cta-button-mint disabled" disabled>
+                <span>No Transaction Emitted (Funds Locked)</span>
+              </button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- Section: Cryptographic Audit Trail / JSON Drawer -->
+      <section class="section-container">
+        <details class="clean-accordion">
+          <summary class="accordion-summary">
+            <div class="accordion-summary-left">
+              <div class="accordion-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="16 18 22 12 16 6"></polyline>
+                  <polyline points="8 6 2 12 8 18"></polyline>
+                </svg>
+              </div>
+              <div>
+                <span class="accordion-title">Cryptographic Audit Trail & JSON Payloads</span>
+                <span class="accordion-desc">Ajv schema-validated decision contracts</span>
+              </div>
+            </div>
+            <div class="accordion-chevron">▼</div>
+          </summary>
+          <div class="accordion-body">
+            <div class="pill-tabs-strip">
+              <button class="pill-tab-btn active" data-json="decision">decision.json (Guardian AI)</button>
+              <button class="pill-tab-btn" data-json="action">policy-result.json (Policy Enforcer)</button>
+            </div>
+            <div class="json-box-panel" id="panelDecision">
+              <pre class="clean-json-pre" id="rawDecisionJson"></pre>
+            </div>
+            <div class="json-box-panel" id="panelAction" style="display: none;">
+              <pre class="clean-json-pre" id="rawActionJson"></pre>
+            </div>
+          </div>
+        </details>
+      </section>
+    </main>
+
+    <!-- Bottom Navigation Bar (Inspired by the Reference UI) -->
+    <nav class="bottom-app-nav">
+      <button class="nav-item active" data-nav="overview">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>Overview</span>
+        <span class="nav-dot"></span>
+      </button>
+
+      <button class="nav-item" data-nav="scenarios">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="8" r="7"></circle>
+          <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+        </svg>
+        <span>Scenarios</span>
+        <span class="nav-dot"></span>
+      </button>
+
+      <button class="nav-item" data-nav="memory">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7zM9 21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9v1z"></path>
+        </svg>
+        <span>Memory</span>
+        <span class="nav-dot"></span>
+      </button>
+
+      <button class="nav-item" data-nav="policy">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+        <span>Policy</span>
+        <span class="nav-dot"></span>
+      </button>
+
+      <button class="nav-item" data-nav="escrow">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path>
+          <path d="M12 18V6"></path>
+        </svg>
+        <span>Escrow</span>
+        <span class="nav-dot"></span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast-pill">Address copied to clipboard</div>
+
+  <!-- Interactive Test & Simulation Modal -->
+  <div class="modal-backdrop" id="simModalBackdrop" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-head">
+        <div class="modal-head-left">
+          <div class="modal-icon-wrap bg-mint">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0f5154" stroke-width="2.5">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+          </div>
+          <div>
+            <h3 class="modal-title">Simulate Deliverable Review</h3>
+            <p class="modal-subtitle">Test how Sibyl Memory & Base Sepolia Escrow Gate evaluate custom deliverables</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeSimModalBtn" title="Close">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Quick Preset Buttons -->
+        <div class="sim-section-label">1. Quick Presets</div>
+        <div class="sim-presets-strip">
+          <button class="preset-chip active" data-sim-preset="revision">🟡 Missing Idempotency</button>
+          <button class="preset-chip" data-sim-preset="approved">🟢 Full Release (Pass All)</button>
+          <button class="preset-chip" data-sim-preset="dispute">🔴 Open Dispute Lock</button>
+        </div>
+
+        <!-- Custom Deliverable Parameters -->
+        <div class="sim-section-label" style="margin-top: 10px;">2. Deliverable Evidence</div>
+        <div class="sim-form-grid">
+          <div class="sim-field">
+            <label class="sim-label" for="simCommitInput">Git Commit SHA / Evidence ID</label>
+            <input type="text" class="sim-text-input font-mono" id="simCommitInput" value="commit-abc123">
+          </div>
+          <div class="sim-field">
+            <label class="sim-label" for="simSummaryInput">Code Evidence Summary</label>
+            <input type="text" class="sim-text-input" id="simSummaryInput" value="Adds API endpoints and improves UI, but does not mention retries or idempotency.">
+          </div>
+        </div>
+
+        <!-- Requirements & Safety Toggles -->
+        <div class="sim-section-label" style="margin-top: 10px;">3. Criteria & Safety Flags</div>
+        <div class="sim-toggles-grid">
+          <label class="toggle-card">
+            <input type="checkbox" id="simToggleRetries" class="sim-checkbox">
+            <div class="toggle-card-content">
+              <span class="toggle-card-title">API Retries Implemented</span>
+              <span class="toggle-card-desc">Satisfies milestone criterion #1 (exponential backoff)</span>
+            </div>
+          </label>
+
+          <label class="toggle-card">
+            <input type="checkbox" id="simToggleIdempotency" class="sim-checkbox">
+            <div class="toggle-card-content">
+              <span class="toggle-card-title">Idempotency Keys Handled</span>
+              <span class="toggle-card-desc">Satisfies stakeholder feedback-001 (mutative routes)</span>
+            </div>
+          </label>
+
+          <label class="toggle-card">
+            <input type="checkbox" id="simToggleDispute" class="sim-checkbox">
+            <div class="toggle-card-content">
+              <span class="toggle-card-title">Open Dispute Event</span>
+              <span class="toggle-card-desc">Triggers zero-trust human mediation halt</span>
+            </div>
+          </label>
+        </div>
+
+        <!-- Progress Runner (Hidden until "Run" is clicked) -->
+        <div class="sim-runner-box" id="simRunnerBox" style="display: none;">
+          <div class="runner-step" id="runnerStep1">
+            <span class="runner-dot"></span>
+            <span>1. Querying Sibyl Memory tiers (FTS5 search across historical feedback)...</span>
+          </div>
+          <div class="runner-step" id="runnerStep2">
+            <span class="runner-dot"></span>
+            <span>2. Auditing evidence against acceptance criteria...</span>
+          </div>
+          <div class="runner-step" id="runnerStep3">
+            <span class="runner-dot"></span>
+            <span>3. Verifying deterministic zero-trust policy gates...</span>
+          </div>
+          <div class="runner-step" id="runnerStep4">
+            <span class="runner-dot"></span>
+            <span>4. Checking Base Sepolia smart contract authorization...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="modal-btn-cancel" id="cancelSimBtn">Cancel</button>
+        <button class="modal-btn-submit" id="runSimAuditBtn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          <span>Run Live Audit</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

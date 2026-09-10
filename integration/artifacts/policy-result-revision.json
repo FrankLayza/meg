@@ -1,0 +1,30 @@
+{
+  "policyResult": {
+    "allowed": false,
+    "reason": "Only an approved Guardian decision can release escrow.",
+    "decision_outcome": "request_revision",
+    "escrow_action": "hold",
+    "transaction_hash": null,
+    "receipt_status": null
+  },
+  "escrowAction": {
+    "action": "hold",
+    "chain": "base_sepolia",
+    "contract_address": "0x1111111111111111111111111111111111111111",
+    "milestone_id": "milestone-001",
+    "amount": "100000000000000000",
+    "actor": "cli-user",
+    "tx_hash": null,
+    "receipt_status": null,
+    "policy_result": {
+      "allowed": false,
+      "reason": "Only an approved Guardian decision can release escrow.",
+      "decision_outcome": "request_revision",
+      "escrow_action": "hold",
+      "transaction_hash": null,
+      "receipt_status": null
+    },
+    "created_at": "2026-09-10T11:03:59.866Z"
+  },
+  "dry_run": true
+}

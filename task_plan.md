@@ -26,28 +26,19 @@ Create a complete, implementation-ready PRD and a three-person execution board f
 - Target a narrow software-freelance milestone workflow for the MVP.
 - Treat Sibyl Memory as a critical-path dependency with an explicit deletion test and fresh-session recall demo.
 
-## Errors Encountered
+## Resolved Toolchain Items
 
-- `pytest` is not installed in the environment, so Python tests could not be executed yet; Python source compilation passed.
-- Node.js is not available on the current PATH, so TypeScript builds/tests must be run after the Node toolchain is installed or enabled.
+- `pytest` and `sibyl-memory-client` are installed and verified in `.venv` (8 passing unit tests, deletion test passing).
+- Node.js (v20.19.5) and pnpm (v10.13.1) are active across the workspace (39 passing escrow tests, 10 passing demo tests).
 
 ## Status
 
-**Contributor 1 complete; Contributors 2 and 3 pending** - The independent workspaces, shared contracts, fixtures, and the real Sibyl-backed Guardian workflow are implemented and verified. Integration remains gated on the other two standalone workstreams.
+**All Contributors (1, 2, and 3) complete; Integration pipeline verified** - The independent workspaces, shared contracts, fixtures, real Sibyl-backed Guardian workflow, Base Sepolia escrow policy gate, presentation surface, web dashboard, and integration orchestrator are implemented and verified.
 
-## Contributor 1 Implementation Tasks
+## Contributor Completion Summary
 
-- [x] Install and verify `sibyl-memory-client` from the official Sibyl package.
-- [x] Define the project and milestone fixture schema.
-- [x] Implement a real Sibyl-backed memory adapter using an isolated local database for tests.
-- [x] Map requirements, entities, feedback, evidence, decisions, and unresolved issues to Sibyl tiers.
-- [x] Implement project-scoped retrieval and bounded review-context assembly.
-- [x] Define and validate the `approve` / `request_revision` / `escalate` decision JSON contract.
-- [x] Add a temporary deterministic reasoning function so the memory workflow runs without an LLM.
-- [x] Add fresh-session recall, contradictory-feedback, missing-evidence, and malformed-decision tests.
-- [x] Add the deletion test proving the evaluation loses project-specific context without Sibyl Memory.
-- [x] Document the future LLM provider interface and MCP/TypeScript integration boundary.
+- **Contributor 1 (Guardian Memory):** Complete. Uses real Sibyl client with SQLite FTS5 across HOT/WARM/REFERENCE/COLD tiers. 8/8 pytest tests pass, deletion test proves memory is load-bearing.
+- **Contributor 2 (Base Escrow):** Complete. `MilestoneEscrow.sol` compiled via `solc`. Deterministic policy gate enforces cap, dispute, allowlist, and confirmation. 39/39 unit tests pass, TypeScript builds cleanly.
+- **Contributor 3 (Demo Surface):** Complete. Zero-dependency ANSI terminal UI (`cli.ts`), scenario manager (`scenarios.ts`), and standalone web dashboard (`server.ts` + `public/`) implemented. 10/10 unit tests pass, TypeScript builds cleanly.
+- **Integration Layer:** Complete. `integration/orchestrator.ts` connects C1 -> C2 -> C3 end-to-end. One-command scripts `scripts/run-demo.ps1` and `scripts/run-demo.sh` provide turnkey reproduction.
 
-## Contributor 1 Completion
-
-Contributor 1 is complete in commit `2377a56`. The implementation uses the real Sibyl client, retrieves scoped event history through `read_events()`, validates the shared decision contract, and keeps the model provider replaceable through `ReasoningProvider`. Verification: 8 tests passed, Python compilation passed, CLI replay passed, and the deletion test confirmed a different outcome without memory.
